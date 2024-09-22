@@ -102,11 +102,25 @@ class ReturningController:
             # ลูปผ่าน booking_details และสร้าง returning สำหรับแต่ละรายการ
             
             for detail in booking_details:
+                # ตรวจสอบว่ามี PlaceEquipment หรือไม่
+                equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=detail.place_equipment_id).first()
+                if equipment_place is None:
+                    raise ValueError(404, "Equipment not found") 
+                
+                over = equipment_place.available_stock + detail.booking_quantity
+                # ตรวจสอบว่าไม่เกิน stock
+                if over > equipment_place.stock:
+                    raise ValueError(400, "Over stock available")
+
+                # เพิ่มจำนวน available_stock
+                equipment_place.available_stock += detail.booking_quantity
+
                 new_returning = Returning(
                     booking_detail_id=detail.booking_detail_id,
                     returning_time=datetime.datetime.now(),
                     returning_quantity=detail.booking_quantity   
                 )
+                
                 self.db.add(new_returning)
 
             # Commit transaction
