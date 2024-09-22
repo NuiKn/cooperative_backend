@@ -20,21 +20,22 @@ class ReturningResponse(ReturningBase):
         orm_mode = True
 
 
-# # # # # # # 
+# # # # # # #  satart
 
-# class Equipment(BaseModel):
-#     place_equipment_id: int 
-#     booking_quantity: int
+class Equipment(BaseModel):
+    place_equipment_id: int 
+    booking_quantity: int
 
-# class ReturningCreateCustom(BaseModel): 
-#     booking_id: int  
-#     class Config:
-#         orm_mode = True
+class ReturningCreateCustom(BaseModel): 
+    booking_id: int  
+    equipments:List[Equipment]
+    class Config:
+        orm_mode = True
 
  
 
 
-# # # # # # # 
+# # # # # # #  end
 
 
 
