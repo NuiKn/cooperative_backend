@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
+from routers import auth_router, user__router
 from routers.equipment_router import router as equipment_router
 from routers.place_routers import router as place_router
 from routers.placeEquipment_router import router as placeEquipment_router
@@ -18,6 +20,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
+app.include_router(user__router.router, prefix="/user", tags=["user"])
+
+
+
 
 # รวม router
 app.include_router(equipment_router,tags=["Equipment"])
