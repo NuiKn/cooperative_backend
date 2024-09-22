@@ -170,15 +170,16 @@ class BookingController:
 
 
 ###### user ####
-    def create_booking_user(self, booking_details: List[BookingDetailBaseCreateUser]):
+    def create_booking_user(self, booking_details: BookingDetailBaseCreateUser):
         try:
             print("Starting transaction...")
 
             # สร้างรายการ Booking ใหม่
-            user_id = 1
+            user_id = booking_details.user_id
+            
             booking_status = "จอง"
             booking_time = datetime.now()  # ใช้เวลาปัจจุบัน
-            note = "รายละเอียดการจอง"
+            note = ""
 
             new_booking = Booking(
                 user_id=user_id,
@@ -194,7 +195,7 @@ class BookingController:
             print(f"Booking created with ID: {new_booking.booking_id}")
 
             # สร้างรายการ BookingDetail แต่ละรายการ
-            for detail in booking_details:
+            for detail in booking_details.detail:
                 if detail.booking_quantity <= 0:
                     raise ValueError(400, "Please enter quantity of equipment more than zero.") 
                      

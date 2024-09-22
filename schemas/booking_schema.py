@@ -35,9 +35,14 @@ class BookingResponse(BookingCreate):
 
 ##User##
 
-class BookingDetailBaseCreateUser(BaseModel):
+class PlaceEquipment(BaseModel):
     place_equipment_id: int
     booking_quantity: int
+
+    
+class BookingDetailBaseCreateUser(BaseModel):
+    user_id:int
+    detail:List[PlaceEquipment]
 
 
 ##User##

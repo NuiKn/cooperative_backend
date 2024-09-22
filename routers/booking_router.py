@@ -36,7 +36,7 @@ def delete_booking_admin(booking_id: int, db: Session = Depends(get_db)):
 
 # finish
 @router.post("/user/booking/", response_model=Booking)
-def create_booking_user(booking_details: List[BookingDetailBaseCreateUser], db: Session = Depends(get_db)):
+def create_booking_user(booking_details: BookingDetailBaseCreateUser, db: Session = Depends(get_db)):
     controller = BookingController(db)
     return controller.create_booking_user(booking_details)
 
