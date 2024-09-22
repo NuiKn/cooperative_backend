@@ -24,7 +24,7 @@ class AuthController:
                 "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)  # เวลาหมดอายุ
             }
             encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-            return encoded_jwt, data.username, user.user_id
+            return encoded_jwt, data.username, user.user_id, user.role
         else:
             raise HTTPException(status_code=404, detail="username or password is not valid")
 
