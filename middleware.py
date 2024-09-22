@@ -20,6 +20,7 @@ async def check_permissions(request: Request):
         raise HTTPException(status_code=403, detail="Not authenticated")
 
     request.state.role = role  # เก็บ role ไว้ใน request state
+    return role
 
 def decode_token(token: str):
     try:

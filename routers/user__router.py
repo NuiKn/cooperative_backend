@@ -33,7 +33,7 @@ def delete_existing_user(user_id: int, db: Session = Depends(get_db)):
 #อ่าน user ทุกคน admin
 @router.get("/", response_model=List[UserOut])
 async def read_all_users(db: Session = Depends(get_db), role: str = Depends(check_permissions)):
-    if role == "admin":
+    if role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return UserController.get_all_users(db)
 
