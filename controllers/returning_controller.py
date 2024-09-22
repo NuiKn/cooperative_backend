@@ -118,3 +118,54 @@ class ReturningController:
         except Exception as e:
             self.db.rollback()  # ยกเลิกการเปลี่ยนแปลงถ้าเกิดข้อผิดพลาด
             return {"error": str(e)}
+        
+
+    def create_returning(self, returning_data):
+        try:
+            # ตรวจสอบว่ามี booking_id นี้หรือไม่
+            booking_id = returning_data.booking_id
+            booking_details = self.db.query(BookingDetail).filter_by(booking_id=booking_id).all()
+
+            if not booking_details:
+                raise HTTPException(status_code=404, detail="Booking not found")
+
+            # วนลูปบันทึกการคืนสำหรับอุปกรณ์แต่ละรายการ
+            for equipment in returning_data.equipments:
+                # ค้นหา booking_detail ที่ตรงกับ place_equipment_id และ booking_id
+                booking_detail = self.db.query(BookingDetail).filter(
+                    BookingDetail.place_equipment_id == equipment.place_equipment_id,
+                    BookingDetail.booking_id == booking_id
+                ).first()
+
+                if not booking_detail:
+                    raise HTTPException(status_code=404, detail=f"Booking detail not found for equipment id {equipment.place_equipment_id}")
+
+                # # เช็คว่า equipment.booking_quantity <= booking_detail.booking_quantity
+                # if equipment.booking_quantity > booking_detail.booking_quantity:
+                #     raise HTTPException(
+                #         status_code=400, 
+                #         detail=f"Returning quantity {equipment.booking_quantity} exceeds borrowed quantity {booking_detail.booking_quantity} for equipment id {equipment.place_equipment_id}"
+                #     )
+
+
+                # สร้าง returning record
+                new_returning = Returning(
+                    booking_detail_id=booking_detail.booking_detail_id,
+                    returning_quantity=equipment.booking_quantity,
+                    returning_time=datetime.datetime.now()  # อาจใช้เวลาปัจจุบัน
+                )
+
+                self.db.add(new_returning)
+
+            # บันทึกข้อมูลทั้งหมดลงในฐานข้อมูล
+            self.db.commit()
+            return {"message": "Returning created successfully"}
+
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
+

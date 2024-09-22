@@ -16,6 +16,7 @@ class BookingDetailBase(BaseModel):
     place_equipment_id: int
     equipment_name: Optional[str] = None  # กำหนดให้เป็น optional โดยมีค่าเริ่มต้นเป็น None
     booking_quantity: int
+    returning_quantity:int         # # # # # # ถ้า เกิด errorให้แก้ตรงนี้
 
 class BookingCreate(BookingBase): 
     booking_detail: List[BookingDetailBase]  # เพิ่ม booking_detail
