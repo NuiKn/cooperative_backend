@@ -43,9 +43,9 @@ def create_booking_user(booking_details: BookingDetailBaseCreateUser, db: Sessio
 
 # finish
 @router.get("/booking/{booking_id}", response_model=BookingResponse)
-def read_booking(booking_id: int, user_id=int ,page: int =None, limit: int =None, db: Session = Depends(get_db)):
+def read_booking(booking_id: int, user_id=int , db: Session = Depends(get_db)):
     controller = BookingController(db)
-    return controller.get_booking(booking_id,user_id,page=page, limit=limit)
+    return controller.get_booking(booking_id,user_id)
 
 
 @router.get("/bookings/", response_model=List[BookingResponse])
