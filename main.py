@@ -16,6 +16,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
 # กำหนด CORS (Cross-Origin Resource Sharing) ถ้าจำเป็น
 app.add_middleware(
     CORSMiddleware,

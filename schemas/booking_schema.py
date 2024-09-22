@@ -27,6 +27,8 @@ class Booking(BookingBase):
 
 class BookingResponse(BookingCreate):
     booking_id: int  # เพิ่ม booking_id เพื่อให้ข้อมูลครบถ้วน
+    sername:str
+    lastname:str
     class Config:
         orm_mode = True
  

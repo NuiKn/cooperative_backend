@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from models.booking_model import Booking
 from models.booking_detail_model import BookingDetail 
+from models.user_model import User
 from schemas.booking_schema import BookingCreate ,BookingResponse,BookingDetailBase ,BookingDetailBaseCreateUser
 from sqlalchemy.exc import SQLAlchemyError
 from models.placeEquipment_model import PlaceEquipment
@@ -257,8 +258,10 @@ class BookingController:
                 Booking.note,
                 BookingDetail.place_equipment_id,
                 BookingDetail.booking_quantity,
-                Equipment.equipment_name
-            ).join(BookingDetail, Booking.booking_id == BookingDetail.booking_id).join(PlaceEquipment, BookingDetail.place_equipment_id == PlaceEquipment.place_equipment_id).join(Equipment, PlaceEquipment.equipment_id == Equipment.equipment_id)
+                Equipment.equipment_name,
+                User.sername,
+                User.lastname
+            ).join(BookingDetail, Booking.booking_id == BookingDetail.booking_id).join(PlaceEquipment, BookingDetail.place_equipment_id == PlaceEquipment.place_equipment_id).join(Equipment, PlaceEquipment.equipment_id == Equipment.equipment_id).join(User, User.user_id == Booking.user_id)
 
             # หาก user_id ไม่เป็น None ให้กรองข้อมูล
             if user_id is not None:
@@ -285,7 +288,9 @@ class BookingController:
                         "booking_status": detail.booking_status,
                         "note": detail.note,
                         "booking_detail": [],
-                        "booking_id": booking_id
+                        "booking_id": booking_id,
+                        "sername":detail.sername,
+                        "lastname":detail.lastname
                     }
 
                 # เพิ่มรายละเอียดการจองลงใน booking_detail

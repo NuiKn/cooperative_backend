@@ -20,6 +20,23 @@ class ReturningResponse(ReturningBase):
         orm_mode = True
 
 
+# # # # # # # 
+
+# class Equipment(BaseModel):
+#     place_equipment_id: int 
+#     booking_quantity: int
+
+# class ReturningCreateCustom(BaseModel): 
+#     booking_id: int  
+#     class Config:
+#         orm_mode = True
+
+ 
+
+
+# # # # # # # 
+
+
 
 # class ReturningDetail(BaseModel):
 #     place_equipment_id: int
