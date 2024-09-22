@@ -168,41 +168,109 @@ class ReturningController:
             if response.status_code == 200:
                 data = response.json()
                 booking_detail = data["booking_detail"]
+                booking = self.db.query(Booking).filter_by(booking_id=data["booking_id"]).first()
+                status_booking = booking.booking_status
+                print(f"status_booking{status_booking}")
+                if status_booking == 'จอง' :
+                    raise HTTPException(status_code=400, detail="คุณยังไม่ได้มาเอาของ")
+                if status_booking == 'คืนครบ' :
+                    raise HTTPException(status_code=400, detail="คุณคืนครบแล้ว")
+                if status_booking != 'กำลังยืม' :
+                    raise HTTPException(status_code=400, detail="you is not status 'กำลังยืม'")
+                       
                 # print(booking_detail)
 
                 # เช็ค place_equipment_id ว่าตรงกันไหม
                 # for equipment in returning.equipments:
-                for index, equipment in enumerate(returning.equipments):
-                    if any(detail['place_equipment_id'] == equipment.place_equipment_id for detail in booking_detail):
-                        equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=equipment.place_equipment_id).first()
-                        print("xxx") 
-                        print(f"booking_detail[index]['booking_quantity']: {booking_detail[index]['booking_quantity']}") 
-                        print(f"(equipment.returning_quantity+booking_detail[index]['returning_quantity']): { (equipment.returning_quantity+booking_detail[index]['returning_quantity']) }") 
-                        print(f"(equipment.returning_quantity): { (equipment.returning_quantity) }")
-                        print(f"(booking_detail[index]['returning_quantity']): {booking_detail[index]['returning_quantity'] }")
-                        if(booking_detail[index]['booking_quantity'] > (equipment.returning_quantity+booking_detail[index]['returning_quantity'])):
-                            equipment_place.available_stock+=equipment.returning_quantity
-                        else:
-                            self.db.rollback()
-                            raise HTTPException(status_code=400, detail="you return over.")
-                        # เพิ่มข้อมูลลงในฐานข้อมูล
-                        # สร้าง instance ของ returning ที่จะเพิ่ม
-                        print(equipment)
-                        print(booking_detail[index]['booking_detail_id'])
-                        new_returning = Returning(
-                            booking_detail_id= booking_detail[index]['booking_detail_id'],
-                            returning_quantity=equipment.returning_quantity,
-                            returning_time=datetime.datetime.now()
-                        )
-                        print("xxx") 
-                        self.db.add(new_returning)
-                    else:
+                for equipment in returning.equipments:
+                    status_in_loop = False
+                    for index in range(len(booking_detail)): 
+                        print(booking_detail[index]['place_equipment_id'])
+                        if booking_detail[index]['place_equipment_id'] == equipment.place_equipment_id :
+                            equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=equipment.place_equipment_id).first()
+                            print("xxx") 
+                            print(f"booking_detail[index]['booking_quantity']: {booking_detail[index]['booking_quantity']}") 
+                            print(f"(equipment.returning_quantity+booking_detail[index]['returning_quantity']): { (equipment.returning_quantity+booking_detail[index]['returning_quantity']) }") 
+                            print(f"(equipment.returning_quantity): { (equipment.returning_quantity) }")
+                            print(f"(booking_detail[index]['returning_quantity']): {booking_detail[index]['returning_quantity'] }")
+                            if(booking_detail[index]['booking_quantity'] >= (equipment.returning_quantity+booking_detail[index]['returning_quantity'])):
+                                equipment_place.available_stock+=equipment.returning_quantity
+                            else:
+                                self.db.rollback()
+                                raise HTTPException(status_code=400, detail="you return over.")
+                            # เพิ่มข้อมูลลงในฐานข้อมูล
+                            # สร้าง instance ของ returning ที่จะเพิ่ม
+                            print(equipment)
+                            print(booking_detail[index]['booking_detail_id'])
+                            new_returning = Returning(
+                                booking_detail_id= booking_detail[index]['booking_detail_id'],
+                                returning_quantity=equipment.returning_quantity,
+                                returning_time=datetime.datetime.now()
+                            )
+                            print("xxx") 
+                            self.db.add(new_returning)
+                            print("KUAYYY")
+                            status_in_loop = True
+                    if status_in_loop == False:
                         # ถ้าไม่ตรงให้ rollback
                         self.db.rollback()
                         raise HTTPException(status_code=400, detail="place_equipment_id does not match.")
+                        
 
+
+
+
+                # ######### Backup 
+                # for index, equipment in enumerate(returning.equipments):
+                #     if any(detail['place_equipment_id'] == equipment.place_equipment_id for detail in booking_detail):
+                #         equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=equipment.place_equipment_id).first()
+                #         print("xxx") 
+                #         print(f"booking_detail[index]['booking_quantity']: {booking_detail[index]['booking_quantity']}") 
+                #         print(f"(equipment.returning_quantity+booking_detail[index]['returning_quantity']): { (equipment.returning_quantity+booking_detail[index]['returning_quantity']) }") 
+                #         print(f"(equipment.returning_quantity): { (equipment.returning_quantity) }")
+                #         print(f"(booking_detail[index]['returning_quantity']): {booking_detail[index]['returning_quantity'] }")
+                #         if(booking_detail[index]['booking_quantity'] >= (equipment.returning_quantity+booking_detail[index]['returning_quantity'])):
+                #             equipment_place.available_stock+=equipment.returning_quantity
+                #         else:
+                #             self.db.rollback()
+                #             raise HTTPException(status_code=400, detail="you return over.")
+                #         # เพิ่มข้อมูลลงในฐานข้อมูล
+                #         # สร้าง instance ของ returning ที่จะเพิ่ม
+                #         print(equipment)
+                #         print(booking_detail[index]['booking_detail_id'])
+                #         new_returning = Returning(
+                #             booking_detail_id= booking_detail[index]['booking_detail_id'],
+                #             returning_quantity=equipment.returning_quantity,
+                #             returning_time=datetime.datetime.now()
+                #         )
+                #         print("xxx") 
+                #         self.db.add(new_returning)
+                #     else:
+                #         # ถ้าไม่ตรงให้ rollback
+                #         self.db.rollback()
+                #         raise HTTPException(status_code=400, detail="place_equipment_id does not match.")
+
+
+                  
+                
+                
+                
+                
                 # Commit transaction ถ้าทุกอย่างเรียบร้อย
                 self.db.commit()
+                response = requests.get(url)
+                data2 = response.json()
+                booking_details = data2["booking_detail"]
+                status_check_after = True
+                for booking_detail in booking_details:
+                    if booking_detail['booking_quantity'] != booking_detail['returning_quantity']:
+                        status_check_after = False 
+
+                if status_check_after :
+                    booking = self.db.query(Booking).filter_by(booking_id=data["booking_id"]).first()
+                    booking.booking_status="คืนครบ"
+                    self.db.commit()
+
                 return {"message": "Success", "booking_detail": booking_detail}
             else:
                 raise HTTPException(status_code=response.status_code, detail=f"Error: {response.status_code}")
