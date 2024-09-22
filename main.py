@@ -5,6 +5,10 @@ from routers import auth_router, user__router
 from routers.equipment_router import router as equipment_router
 from routers.place_routers import router as place_router
 from routers.placeEquipment_router import router as placeEquipment_router
+# start thar
+from routers.booking_router import router as booking_router   
+from routers.returning_router import router as returning_router   
+# end thar
 from database import engine, Base
 
 # สร้างฐานข้อมูล
@@ -34,6 +38,12 @@ app.include_router(user__router.router, prefix="/user", tags=["user"])
 app.include_router(equipment_router,tags=["Equipment"])
 app.include_router(place_router,tags=["Place"])
 app.include_router(placeEquipment_router,tags=["PlaceEquipment"])
+
+
+# start thar 
+app.include_router(booking_router,tags=["Booking"])
+app.include_router(returning_router,tags=["Returning"])
+# end thar
 
 
 @app.get("/")
