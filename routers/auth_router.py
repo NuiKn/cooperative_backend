@@ -17,8 +17,16 @@ router = APIRouter()
 
 @router.post("/login")
 async def login(data: LoginRequest, db: Session = Depends(get_db)):
-    access_token = AuthController.create_access_token(data, db=db)
-    return {"access_token": access_token, "token_type": "bearer"}
+    # เรียกฟังก์ชัน create_access_token เพื่อสร้าง token และดึงข้อมูลผู้ใช้
+    access_token, username, user_id, = AuthController.create_access_token(data, db=db)
+
+    # คืนค่าพร้อม access_token, user_id, และ username
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_id": user_id,
+        "username": username
+    }
 
 @router.post("/register", response_model=UserOut)
 def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
