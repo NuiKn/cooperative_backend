@@ -28,17 +28,14 @@ class PlaceEquipmentController:
         
         return [{"place_id": pe.place_id, "equipment_name": pe.place_equipment_id} for pe in results] """
         stmt = (
-        select(Place.place_name, Equipment.equipment_name ,PlaceEquipment.available_stock)
+        select(Place.place_name,Place.place_id, Equipment.equipment_name,Equipment.equipment_id,PlaceEquipment.available_stock,PlaceEquipment.stock)
         .join(PlaceEquipment, Place.place_id == PlaceEquipment.place_id)
         .join(Equipment, PlaceEquipment.equipment_id == Equipment.equipment_id)
         .where(Place.place_id == place_id)
         )
         results = db.execute(stmt).all()
-        print(results)
-
-
-        
-        return [{"place_name": place_name, "equipment_name": equipment_name ,"available_stock": available_stock} for place_name, equipment_name,available_stock in results]
+        return [{"place_name": place_name,"place_id": place_id, "equipment_name": equipment_name ,"equipment_id": equipment_id,"available_stock": available_stock,"stock": stock} 
+                for place_name,place_id, equipment_name,equipment_id,available_stock,stock in results]
         
 
     @staticmethod
