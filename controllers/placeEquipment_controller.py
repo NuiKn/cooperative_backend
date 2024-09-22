@@ -41,11 +41,11 @@ class PlaceEquipmentController:
     @staticmethod
     def create_placeEquipment(db: Session, place_equipment: PlaceEquipmentCreate):
         db_place_equipment = PlaceEquipment(**place_equipment.dict())
+        db_place_equipment.available_stock = db_place_equipment.stock
         existing_equipment = db.query(Equipment).filter(Equipment.equipment_id == place_equipment.equipment_id).first()
         existing_place = db.query(Place).filter(Place.place_id == place_equipment.place_id).first()
         if existing_equipment is None or existing_place is None :
             raise HTTPException(status_code=404, detail="data not found")
-        
         db.add(db_place_equipment)
         db.commit()
         db.refresh(db_place_equipment)
@@ -61,11 +61,13 @@ class PlaceEquipmentController:
     @staticmethod
     def update_placeEquipment(db: Session, place_equipment_id: int, place_equipment: PlaceEquipmentUpdate):
         db_place_equipment = db.query(PlaceEquipment).filter(PlaceEquipment.place_equipment_id == place_equipment_id).first()
+        
         if db_place_equipment is None:
             raise HTTPException(status_code=404, detail="PlaceEquipment not found")
 
         for key, value in place_equipment.dict(exclude_unset=True).items():
             setattr(db_place_equipment, key, value)
+        db_place_equipment.available_stock = db_place_equipment.stock
 
         db.commit()
         db.refresh(db_place_equipment)

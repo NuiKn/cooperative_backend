@@ -7,7 +7,6 @@ class PlaceEquipmentBase(BaseModel):
     place_id: int
     equipment_id: int
     stock: int
-    available_stock: int
 
 class PlaceEquipmentCreate(PlaceEquipmentBase):
     pass

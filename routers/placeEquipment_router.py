@@ -19,7 +19,7 @@ def getAll_placeEquipment(db: Session = Depends(get_db),role: str = Depends(chec
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return PlaceEquipmentController.getAll_placeEquipment(db=db)
 
-@router.post("/place_equipment/", response_model=PlaceEquipment)
+@router.post("/place_equipment/")
 def create_placeEquipment(place_equipment: PlaceEquipmentCreate, db: Session = Depends(get_db),role: str = Depends(check_permissions)):
     if role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
@@ -31,7 +31,7 @@ def getById_placeEquipment(place_equipment_id: int, db: Session = Depends(get_db
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return PlaceEquipmentController.getById_placeEquipment(db=db, place_equipment_id=place_equipment_id)
  
-@router.put("/place_equipment/{place_equipment_id}", response_model=PlaceEquipment)
+@router.put("/place_equipment/{place_equipment_id}")
 def update_placeEquipment(place_equipment_id: int, place_equipment: PlaceEquipmentUpdate, db: Session = Depends(get_db),role: str = Depends(check_permissions)):
     if role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
