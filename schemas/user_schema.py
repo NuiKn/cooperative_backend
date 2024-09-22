@@ -18,6 +18,7 @@ class UserUpdate(UserBase):
 
 # ใช้สำหรับการตอบกลับ (ไม่แสดง password)
 class UserOut(BaseModel):
+    user_id: int
     user_name: str
     sername: str
     lastname: str
