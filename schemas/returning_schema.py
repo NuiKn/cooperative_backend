@@ -24,9 +24,22 @@ class ReturningResponse(ReturningBase):
 
 class Equipment(BaseModel):
     place_equipment_id: int 
-    booking_quantity: int
+    returning_quantity: int
 
 class ReturningCreateCustom(BaseModel): 
+    booking_id: int  
+    user_id:int
+    equipments:List[Equipment]
+    class Config:
+        orm_mode = True
+
+
+class Equipment2(BaseModel):
+    booking_detail_id:int
+    place_equipment_id: int 
+    booking_quantity: int
+
+class ReturningCreateCustom2(BaseModel): 
     booking_id: int  
     user_id:int
     equipments:List[Equipment]

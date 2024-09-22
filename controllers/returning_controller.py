@@ -168,19 +168,33 @@ class ReturningController:
             if response.status_code == 200:
                 data = response.json()
                 booking_detail = data["booking_detail"]
-                print(booking_detail)
+                # print(booking_detail)
 
                 # เช็ค place_equipment_id ว่าตรงกันไหม
-                for equipment in returning.equipments:
+                # for equipment in returning.equipments:
+                for index, equipment in enumerate(returning.equipments):
                     if any(detail['place_equipment_id'] == equipment.place_equipment_id for detail in booking_detail):
+                        equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=equipment.place_equipment_id).first()
+                        print("xxx") 
+                        print(f"booking_detail[index]['booking_quantity']: {booking_detail[index]['booking_quantity']}") 
+                        print(f"(equipment.returning_quantity+booking_detail[index]['returning_quantity']): { (equipment.returning_quantity+booking_detail[index]['returning_quantity']) }") 
+                        print(f"(equipment.returning_quantity): { (equipment.returning_quantity) }")
+                        print(f"(booking_detail[index]['returning_quantity']): {booking_detail[index]['returning_quantity'] }")
+                        if(booking_detail[index]['booking_quantity'] > (equipment.returning_quantity+booking_detail[index]['returning_quantity'])):
+                            equipment_place.available_stock+=equipment.returning_quantity
+                        else:
+                            self.db.rollback()
+                            raise HTTPException(status_code=400, detail="you return over.")
                         # เพิ่มข้อมูลลงในฐานข้อมูล
                         # สร้าง instance ของ returning ที่จะเพิ่ม
+                        print(equipment)
+                        print(booking_detail[index]['booking_detail_id'])
                         new_returning = Returning(
-                            booking_id=returning.booking_id,
-                            place_equipment_id=equipment.place_equipment_id,
+                            booking_detail_id= booking_detail[index]['booking_detail_id'],
                             returning_quantity=equipment.returning_quantity,
-                            user_id=returning.user_id
+                            returning_time=datetime.datetime.now()
                         )
+                        print("xxx") 
                         self.db.add(new_returning)
                     else:
                         # ถ้าไม่ตรงให้ rollback
@@ -197,6 +211,8 @@ class ReturningController:
             print(f"Request error occurred: {e}")
             self.db.rollback()
             raise HTTPException(status_code=500, detail="Request failed.") 
+        except HTTPException as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail)
         except Exception as e:
             print(f"An error occurred: {e}")
             self.db.rollback()
