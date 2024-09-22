@@ -13,6 +13,7 @@ class BookingBase(BaseModel):
     note: Optional[str] = None
  
 class BookingDetailBase(BaseModel):
+    booking_detail_id: int  #################
     place_equipment_id: int
     equipment_name: Optional[str] = None  # กำหนดให้เป็น optional โดยมีค่าเริ่มต้นเป็น None
     booking_quantity: int

@@ -143,6 +143,7 @@ class BookingController:
                 Booking.booking_time,
                 Booking.booking_status,
                 Booking.note,
+                BookingDetail.booking_detail_id,
                 BookingDetail.place_equipment_id,
                 BookingDetail.booking_quantity,
                 Equipment.equipment_name,
@@ -193,6 +194,7 @@ class BookingController:
                 # เพิ่มรายละเอียดการจองลงใน booking_detail
                 returning_quantity =detail.returning_quantity if  detail.returning_quantity  != None else 0
                 booking_dict[booking_id]["booking_detail"].append({
+                    "booking_detail_id":detail.booking_detail_id,
                     "place_equipment_id": detail.place_equipment_id,
                     "equipment_name": detail.equipment_name,
                     "booking_quantity": detail.booking_quantity,
@@ -221,6 +223,7 @@ class BookingController:
                         Booking.booking_time,
                         Booking.booking_status,
                         Booking.note,
+                        BookingDetail.booking_detail_id,
                         BookingDetail.place_equipment_id,
                         BookingDetail.booking_quantity,
                         Equipment.equipment_name,
@@ -254,6 +257,7 @@ class BookingController:
                     "lastname": booking_with_details[0].lastname,
                     "booking_detail": [
                         {
+                            "booking_detail_id":detail.booking_detail_id,
                             "place_equipment_id": detail.place_equipment_id,
                             "equipment_name": detail.equipment_name,
                             "booking_quantity": detail.booking_quantity,

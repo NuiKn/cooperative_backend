@@ -28,6 +28,7 @@ class Equipment(BaseModel):
 
 class ReturningCreateCustom(BaseModel): 
     booking_id: int  
+    user_id:int
     equipments:List[Equipment]
     class Config:
         orm_mode = True
