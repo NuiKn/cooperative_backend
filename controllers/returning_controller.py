@@ -70,7 +70,6 @@ class ReturningController:
             if not results:
                 raise HTTPException(status_code=404, detail="No returnings found for this booking_id")
 
-        
             return [
                 ReturningResponse(
                     returning_id=result.Returning.returning_id,
@@ -92,9 +91,19 @@ class ReturningController:
 
     def create_returning_all(self, booking_id: int):
         try:
+            booking = self.db.query(Booking).filter(Booking.booking_id == booking_id).first()
+
+            # ตรวจสอบว่าพบ booking หรือไม่
+            if not booking:
+                return {"message": "No booking found for this booking_id"}
+            
+            # ตรวจสอบสถานะ booking_status
+            if booking.booking_status == "คืนครบ":
+                raise ValueError(400, "Cannot return items: booking has already been fully returned.")
+        
             # ดึงรายการ BookingDetail ที่เกี่ยวข้องกับ booking_id นี้
             booking_details = self.db.query(BookingDetail).filter(BookingDetail.booking_id == booking_id).all()
-
+        
             # ตรวจสอบว่าพบ booking_details หรือไม่
             if not booking_details:
                 return {"message": "No booking details found for this booking_id"}
@@ -102,6 +111,7 @@ class ReturningController:
             # ลูปผ่าน booking_details และสร้าง returning สำหรับแต่ละรายการ
             
             for detail in booking_details:
+                print(detail.__dict__)
                 # ตรวจสอบว่ามี PlaceEquipment หรือไม่
                 equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=detail.place_equipment_id).first()
                 if equipment_place is None:
@@ -122,7 +132,10 @@ class ReturningController:
                 )
                 
                 self.db.add(new_returning)
-
+            booking_to_update = self.db.query(Booking).filter(Booking.booking_id == booking_id).first()
+            if booking_to_update:
+                booking_to_update.booking_status = "คืนครบ"
+                self.db.add(booking_to_update)
             # Commit transaction
             self.db.commit()
 
