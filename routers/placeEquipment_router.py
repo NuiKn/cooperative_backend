@@ -12,6 +12,9 @@ router = APIRouter()
 def getAll_placeEquipment(place_id: int,db: Session = Depends(get_db),role: str = Depends(check_permissions)):
     return PlaceEquipmentController.get_place_equipment_by_place_id(db=db,place_id=place_id)
 
+@router.put("/place_equipment/{place_equipment_id}")
+def update_placeEquipment(place_equipment_id: int, place_equipment: PlaceEquipmentUpdate, db: Session = Depends(get_db),role: str = Depends(check_permissions)):
+    return PlaceEquipmentController.update_placeEquipment(db=db, place_equipment_id=place_equipment_id, place_equipment=place_equipment)
 #admin
 @router.get("/place_equipment/", response_model=list[PlaceEquipmentResponse])
 def getAll_placeEquipment(db: Session = Depends(get_db),role: str = Depends(check_permissions)):
@@ -30,12 +33,6 @@ def getById_placeEquipment(place_equipment_id: int, db: Session = Depends(get_db
     if role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return PlaceEquipmentController.getById_placeEquipment(db=db, place_equipment_id=place_equipment_id)
- 
-@router.put("/place_equipment/{place_equipment_id}")
-def update_placeEquipment(place_equipment_id: int, place_equipment: PlaceEquipmentUpdate, db: Session = Depends(get_db),role: str = Depends(check_permissions)):
-    if role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    return PlaceEquipmentController.update_placeEquipment(db=db, place_equipment_id=place_equipment_id, place_equipment=place_equipment)
 
 @router.delete("/place_equipment/{place_equipment_id}", response_model=dict)
 def delete_placeEquipment(place_equipment_id: int, db: Session = Depends(get_db),role: str = Depends(check_permissions)):
