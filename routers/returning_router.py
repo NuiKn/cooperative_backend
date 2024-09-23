@@ -3,16 +3,21 @@ from sqlalchemy.orm import Session
 from typing import List
 from models.returning_model import Returning
 from controllers.returning_controller import ReturningController
-from schemas.returning_schema import ReturningCreate, ReturningResponse,ReturningCreateCustom
+from schemas.returning_schema import ReturningCreateCustomAll, ReturningResponse,ReturningCreateCustom
 from database import get_db
 
 router = APIRouter()
 
 # # # # start create retrun # # # # 
+# @router.post("/returning/all", response_model=None)
+# def create_returning(booking_id: int, db: Session = Depends(get_db)):
+#     controller = ReturningController(db)
+#     return controller.create_returning_all(booking_id)
+
 @router.post("/returning/all", response_model=None)
-def create_returning(booking_id: int, db: Session = Depends(get_db)):
+def create_returning(returning: ReturningCreateCustomAll, db: Session = Depends(get_db)):
     controller = ReturningController(db)
-    return controller.create_returning_all(booking_id)
+    return controller.create_returning_all2(returning)
 
 
 

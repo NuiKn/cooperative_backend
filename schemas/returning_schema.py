@@ -34,18 +34,11 @@ class ReturningCreateCustom(BaseModel):
         orm_mode = True
 
 
-class Equipment2(BaseModel):
-    booking_detail_id:int
-    place_equipment_id: int 
-    booking_quantity: int
-
-class ReturningCreateCustom2(BaseModel): 
+class ReturningCreateCustomAll(BaseModel): 
     booking_id: int  
-    user_id:int
-    equipments:List[Equipment]
-    class Config:
-        orm_mode = True
+    user_id:int 
 
+ 
  
 
 
