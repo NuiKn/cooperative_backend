@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException ,status
+from fastapi import APIRouter, Depends, HTTPException ,status, Request
 from sqlalchemy.orm import Session
 #from database.connection import get_db
 from database import get_db
@@ -6,10 +6,8 @@ from controllers.user_controller import UserController
 from schemas.user_schema import UserCreate, UserUpdate, UserOut
 from typing import List
 from middleware import check_permissions , decode_token
-from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 """ @router.get("/", response_model=List[UserOut])
 def read_all_users(db: Session = Depends(get_db)):
@@ -30,7 +28,7 @@ def delete_existing_user(user_id: int, db: Session = Depends(get_db)):
 
 #### ใช้ token และมีการ login
 
-#อ่าน user ทุกคน admin
+#อ่าน user ทุกคน โดย admin
 @router.get("/", response_model=List[UserOut])
 async def read_all_users(db: Session = Depends(get_db), role: str = Depends(check_permissions)):
     if role != "admin":
@@ -38,8 +36,16 @@ async def read_all_users(db: Session = Depends(get_db), role: str = Depends(chec
     return UserController.get_all_users(db)
 
 @router.get("/me", response_model=UserOut)
-async def read_me(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    user_id = decode_token(token)  
+async def read_me(request: Request, db: Session = Depends(get_db)):
+    # ดึง token จาก Cookies หรือ Authorization header
+    token = request.cookies.get("access_token") or request.headers.get("Authorization").split(" ")[1]
+    
+    if not token:
+        raise HTTPException(status_code=403, detail="Not authenticated")
+
+    # Decode token เพื่อดึง user_id ออกมา
+    user_id = decode_token(token)
+    
     return UserController.get_user(db, user_id)
 
 @router.get("/{user_id}", response_model=UserOut)
