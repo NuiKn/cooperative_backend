@@ -243,9 +243,9 @@ class ReturningController:
                             print(f"(equipment.returning_quantity+booking_detail[index]['returning_quantity']): { (equipment.returning_quantity+booking_detail[index]['returning_quantity']) }") 
                             print(f"(equipment.returning_quantity): { (equipment.returning_quantity) }")
                             print(f"(booking_detail[index]['returning_quantity']): {booking_detail[index]['returning_quantity'] }")
-                            if equipment.returning_quantity == 0:
+                            if equipment.returning_quantity <= 0:
                                 self.db.rollback()
-                                raise HTTPException(status_code=400, detail="กรุณาคืนของ จำนวน มากกว่า 0.")
+                                raise HTTPException(status_code=400, detail="Please return amount > 0.")
                             elif(booking_detail[index]['booking_quantity'] >= (equipment.returning_quantity+booking_detail[index]['returning_quantity'])):
                                 equipment_place.available_stock+=equipment.returning_quantity
                             else:
