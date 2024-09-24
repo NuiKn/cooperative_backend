@@ -175,6 +175,17 @@ class ReturningController:
                 # เช็ค place_equipment_id ว่าตรงกันไหม  
                 for detail in booking_detail: 
                     if detail['booking_quantity'] > detail['returning_quantity']:
+                        equipment_place = self.db.query(PlaceEquipment).filter_by(place_equipment_id=detail['place_equipment_id']).first()
+                        if equipment_place is None:
+                            raise ValueError(404, "Equipment not found") 
+                        
+                        over = equipment_place.available_stock + detail['booking_quantity']
+                        # ตรวจสอบว่าไม่เกิน stock
+                        if over > equipment_place.stock:
+                            raise ValueError(400, "Over stock available")
+
+                        # เพิ่มจำนวน available_stock
+                        equipment_place.available_stock += detail['booking_quantity']
                         new_returning = Returning(
                                 booking_detail_id= detail['booking_detail_id'],
                                 returning_quantity=detail['booking_quantity']  - detail['returning_quantity'],
